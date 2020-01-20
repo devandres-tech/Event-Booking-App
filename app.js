@@ -1,7 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const graphqlHttp = require('express-graphql');
-const { buildSchema } = require('graphql')
+const { buildSchema } = require('graphql');
+const mongoose = require('mongoose');
 
 const app = express();
 
@@ -59,6 +60,13 @@ app.use('/graphql', graphqlHttp({
   graphiql: true
 }));
 
-app.listen(3000, () => {
-  console.log('Server listening on port 3000');
-});
+// connect to database
+mongoose.connect(`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0-3lj5r.mongodb.net/test?retryWrites=true&w=majority`)
+  .then(() => {
+    app.listen(3000, () => {
+      console.log('Server listening on port 3000');
+    });
+  })
+  .catch((err) => {
+    console.log("failed connection", err);
+  });

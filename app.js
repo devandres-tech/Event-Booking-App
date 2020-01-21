@@ -74,15 +74,27 @@ app.use('/graphql', graphqlHttp({
         title: args.eventInput.title,
         description: args.eventInput.description,
         price: +args.eventInput.price,
-        date: new Date(args.eventInput.date)
+        date: new Date(args.eventInput.date),
+        creator: '5e26679d4518f9800c79f702'
       });
+      let createdEvent;
 
       return event.save()
         .then((result) => {
-          console.log('result', result);
-          return {
+          createdEvent = {
             ...result._doc
           }
+          return User.findById('5e26679d4518f9800c79f702')
+        })
+        .then(user => {
+          if (!user) {
+            throw new Error('User not found');
+          }
+          user.createdEvents.push(event);
+          return user.save();
+        })
+        .then(result => {
+          return createdEvent;
         })
         .catch((err) => {
           console.log('Failed to write to database', err);
@@ -90,7 +102,15 @@ app.use('/graphql', graphqlHttp({
         });
     },
     createUser: (args) => {
-      return bcrypt.hash(args.userInput.password, 12)
+      // check for duplicate user
+      return User.findOne({ email: args.userInput.email })
+        .then(user => {
+          if (user) {
+            throw new Error('User already exists');
+          }
+          // return hashed password to store in database
+          return bcrypt.hash(args.userInput.password, 12)
+        })
         .then(hashedPassword => {
           const user = new User({
             email: args.userInput.email,
@@ -100,7 +120,8 @@ app.use('/graphql', graphqlHttp({
         })
         .then(result => {
           return {
-            ...result._doc
+            ...result._doc,
+            password: null
           }
         })
         .catch(err => {

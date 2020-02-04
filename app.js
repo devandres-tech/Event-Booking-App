@@ -12,6 +12,39 @@ const app = express();
 
 app.use(bodyParser.json());
 
+// Get user by Id
+const user = (userId) => {
+  return User.findById(userId)
+    .then(user => {
+      return {
+        ...user._doc,
+        _id: user.id,
+        createdEvents: events.bind(this, user._doc.createdEvents)
+      }
+    })
+    .catch(err => {
+      throw err;
+    })
+}
+
+// Get events by id
+const events = (eventIds) => {
+  return Event.find({ _id: { $in: eventIds } })
+    .then(events => {
+      return events.map(event => {
+        return {
+          ...event._doc,
+          _id: event.id,
+          // call user function
+          creator: user.bind(this, event.creator)
+        };
+      })
+    })
+    .catch(err => {
+      throw err
+    })
+}
+
 // Graphql config
 app.use('/graphql', graphqlHttp({
   schema: buildSchema(`
@@ -21,12 +54,14 @@ app.use('/graphql', graphqlHttp({
       description: String!
       price: Float!
       date: String!
+      creator: User!
     }
 
     type User {
       _Id: ID!
       email: String!
       password: String
+      createdEvents: [Event!]
     }
 
     input UserInput {
@@ -61,7 +96,8 @@ app.use('/graphql', graphqlHttp({
         .then((events) => {
           return events.map(event => {
             return {
-              ...event._doc
+              ...event._doc,
+              creator: user.bind(this, event._doc.creator)
             }
           })
         })

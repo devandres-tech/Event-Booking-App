@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 // Models
-const Event = require('./models/event');
-const User = require('./models/user');
+const Event = require('../../models/event');
+const User = require('../../models/user');
 
 // Get user by Id
 const user = (userId) => {
@@ -27,7 +27,8 @@ const events = (eventIds) => {
           ...event._doc,
           _id: event.id,
           // call user function
-          creator: user.bind(this, event.creator)
+          creator: user.bind(this, event.creator),
+          date: new Date(event._doc.date).toISOString(),
         };
       })
     })
@@ -43,7 +44,8 @@ module.exports = {
         return events.map(event => {
           return {
             ...event._doc,
-            creator: user.bind(this, event._doc.creator)
+            creator: user.bind(this, event._doc.creator),
+            date: new Date(event._doc.date).toISOString()
           }
         })
       })
@@ -65,7 +67,8 @@ module.exports = {
       .then((result) => {
         createdEvent = {
           ...result._doc,
-          creator: user.bind(this, result._doc.creator)
+          creator: user.bind(this, result._doc.creator),
+          date: new Date(event._doc.date).toISOString()
         }
         return User.findById('5e26679d4518f9800c79f702')
       })

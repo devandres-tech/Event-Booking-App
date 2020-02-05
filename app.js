@@ -1,12 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const graphqlHttp = require('express-graphql');
-const { buildSchema } = require('graphql');
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-// Models
-const Event = require('./models/event');
-const User = require('./models/user');
+
+
 
 const app = express();
 
@@ -118,7 +115,8 @@ app.use('/graphql', graphqlHttp({
       return event.save()
         .then((result) => {
           createdEvent = {
-            ...result._doc
+            ...result._doc,
+            creator: user.bind(this, result._doc.creator)
           }
           return User.findById('5e26679d4518f9800c79f702')
         })

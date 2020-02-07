@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 // Models
 const Event = require('../../models/event');
 const User = require('../../models/user');
+const Booking = require('../../models/booking');
 
 // Get user by Id
 const user = (userId) => {
@@ -87,6 +88,20 @@ module.exports = {
         throw err;
       });
   },
+  bookings: async () => {
+    try {
+      const bookings = await Booking.find();
+      return bookings.map(booking => {
+        return {
+          ...booking._doc,
+          createdAt: newDate(booking._doc.createdAt).toIOSString(),
+          updatedAt: newDate(booking._doc.updatedAt).toIOSString(),
+        }
+      })
+    } catch (err) {
+      throw err;
+    }
+  },
   createUser: (args) => {
     // check for duplicate user
     return User.findOne({ email: args.userInput.email })
@@ -113,5 +128,18 @@ module.exports = {
       .catch(err => {
         throw err
       })
+  },
+  bookEvent: async (args) => {
+    const fetchedEvent = await Event.findOne({ _id: args.eventId })
+    const booking = new Booking({
+      userId: '5e26679d4518f9800c79f702',
+      event: fetchedEvent
+    });
+    const result = await booking.save();
+    return {
+      ...result._doc,
+      createdAt: newDate(result._doc.createdAt).toIOSString(),
+      updatedAt: newDate(result._doc.updatedAt).toIOSString(),
+    }
   }
 }

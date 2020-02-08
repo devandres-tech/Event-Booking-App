@@ -94,8 +94,8 @@ module.exports = {
       return bookings.map(booking => {
         return {
           ...booking._doc,
-          createdAt: newDate(booking._doc.createdAt).toIOSString(),
-          updatedAt: newDate(booking._doc.updatedAt).toIOSString(),
+          createdAt: new Date(booking._doc.createdAt).toIOSString(),
+          updatedAt: new Date(booking._doc.updatedAt).toIOSString(),
         }
       })
     } catch (err) {
@@ -130,16 +130,17 @@ module.exports = {
       })
   },
   bookEvent: async (args) => {
-    const fetchedEvent = await Event.findOne({ _id: args.eventId })
+    const fetchedEvent = await Event.findOne({ _id: args.eventId });
     const booking = new Booking({
       userId: '5e26679d4518f9800c79f702',
       event: fetchedEvent
     });
     const result = await booking.save();
+    console.log('RESULT: ', result.createdAt)
     return {
       ...result._doc,
-      createdAt: newDate(result._doc.createdAt).toIOSString(),
-      updatedAt: newDate(result._doc.updatedAt).toIOSString(),
+      createdAt: new Date(result._doc.createdAt).toISOString(),
+      updatedAt: new Date(result._doc.updatedAt).toISOString(),
     }
   }
 }

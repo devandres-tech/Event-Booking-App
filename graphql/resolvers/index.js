@@ -19,6 +19,20 @@ const user = (userId) => {
     })
 }
 
+// get a single event by Id
+const singleEvent = async (eventId) => {
+  try {
+    const event = await Event.findById(eventId);
+    return {
+      ...event._doc,
+      id: event.id,
+      creator: user.bind(this, event.creator),
+    }
+  } catch (err) {
+    throw err;
+  }
+}
+
 // Get events by id
 const events = (eventIds) => {
   return Event.find({ _id: { $in: eventIds } })
@@ -94,8 +108,10 @@ module.exports = {
       return bookings.map(booking => {
         return {
           ...booking._doc,
-          createdAt: new Date(booking._doc.createdAt).toIOSString(),
-          updatedAt: new Date(booking._doc.updatedAt).toIOSString(),
+          user: user.bind(this, booking._doc.user),
+          event: singleEvent.bind(this, booking._doc.event),
+          createdAt: new Date(booking._doc.createdAt).toISOString(),
+          updatedAt: new Date(booking._doc.updatedAt).toISOString(),
         }
       })
     } catch (err) {
@@ -132,15 +148,31 @@ module.exports = {
   bookEvent: async (args) => {
     const fetchedEvent = await Event.findOne({ _id: args.eventId });
     const booking = new Booking({
-      userId: '5e26679d4518f9800c79f702',
+      user: '5e26679d4518f9800c79f702',
       event: fetchedEvent
     });
     const result = await booking.save();
-    console.log('RESULT: ', result.createdAt)
     return {
       ...result._doc,
+      user: user.bind(this, booking._doc.user),
+      event: singleEvent.bind(this, booking._doc.event),
       createdAt: new Date(result._doc.createdAt).toISOString(),
       updatedAt: new Date(result._doc.updatedAt).toISOString(),
+    }
+  },
+  cancelBooking: async (args) => {
+    try {
+      const booking = await Booking.findById(args.bookingId)
+        .populate('event');
+      const event = {
+        ...booking.event._doc,
+        _id: booking.event.id,
+        creator: user.bind(this, booking.event._doc.creator)
+      }
+      await Booking.deleteOne({ _id: args.bookingId });
+      return event;
+    } catch (err) {
+      throw err;
     }
   }
 }

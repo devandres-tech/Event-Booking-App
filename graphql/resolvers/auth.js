@@ -33,7 +33,7 @@ module.exports = {
   },
   login: async ({ email, password }) => {
     // validate email, password
-    const user = User.findOne({ email: email });
+    const user = await User.findOne({ email: email });
     if (!user) {
       throw new Error('User does not exist');
     }
@@ -42,7 +42,7 @@ module.exports = {
       throw new Error('Invalid Credentials')
     }
     // validate token
-    const token = jwt.sign({ userId: user.id, email: user.email }, 'thesupersecretkey', {
+    const token = await jwt.sign({ userId: user.id, email: user.email }, 'thesupersecretkey', {
       expiresIn: '1h'
     });
     return {

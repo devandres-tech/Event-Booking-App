@@ -1,5 +1,6 @@
 // Models
 const Event = require('../../models/event');
+const User = require('../../models/user');
 // Utils
 const { dateToString } = require('../../utils/date')
 const { transformEvent } = require('./merge')
@@ -16,20 +17,25 @@ module.exports = {
         console.log('Failed to retrieve from events', err)
       })
   },
-  createEvent: (args) => {
+  createEvent: (args, req) => {
+    // check if user is authenticated
+    if (!req.isAuth) {
+      throw new Error('Unauthorized');
+    }
+
     const event = new Event({
       title: args.eventInput.title,
       description: args.eventInput.description,
       price: +args.eventInput.price,
       date: dateToString(args.eventInput.date),
-      creator: '5e26679d4518f9800c79f702'
+      creator: req.userId
     });
     let createdEvent;
 
     return event.save()
       .then((result) => {
         createdEvent = transformEvent(result);
-        return User.findById('5e26679d4518f9800c79f702')
+        return User.findById(req.userId)
       })
       .then(user => {
         if (!user) {

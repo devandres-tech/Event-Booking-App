@@ -5,6 +5,7 @@ import AuthPage from './pages/Auth';
 import './App.css';
 import EventsPage from './pages/Events';
 import BookingsPage from './pages/Bookings';
+import MainNavigation from './components/Navigation/Navigat/MainNavigation'
 
 function App() {
   return (

@@ -1,9 +1,11 @@
 import React from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink } from 'react-router-dom';
+
+import './MainNavigation.css';
 
 export default function MainNavigation() {
   return (
-    <header>
+    <header className="main-navigation">
       <div className="main-navigation__logo">
         <h1>EasyEvent</h1>
       </div>

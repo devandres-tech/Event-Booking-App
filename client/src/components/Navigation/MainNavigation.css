@@ -4,7 +4,7 @@
   top: 0;
   width: 100%;
   height: 3.5rem;
-  background-color: rgb(153, 186, 36);
+  background-color: rgb(126, 31, 208);
   padding: 0 1rem;
   display: flex;
   align-items: center;
@@ -32,11 +32,11 @@
 
 .main-navigation__items a {
   text-decoration: none;
-  color: rgb(36, 38, 36);
+  color: rgb(218, 218, 218);
 }
 
 .main-navigation__items a:hover,
 .main-navigation__items a.active,
 .main-navigation__items a:active {
-  color: rgb(244, 90, 55);
+  color: rgb(228, 222, 31);
 }

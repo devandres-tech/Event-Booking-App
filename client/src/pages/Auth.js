@@ -17,7 +17,25 @@ class AuthPage extends Component {
     if (email.trim().length === 0 || password.trim().length === 0) {
       return;
     }
-    console.log(email, password);
+
+    const requestBody = {
+      query: `
+        mutation {
+          createUser(userInput: {email: "${email}", password: "${password}"}) {
+            _Id
+            email
+          }
+        }
+      `
+    };
+
+    fetch('http://localhost:8000/graphql', {
+      method: 'POST',
+      body: JSON.stringify(requestBody),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
   }
 
   render() {

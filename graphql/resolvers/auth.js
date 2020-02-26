@@ -24,6 +24,7 @@ module.exports = {
       .then(result => {
         return {
           ...result._doc,
+          _id: result.id,
           password: null
         }
       })

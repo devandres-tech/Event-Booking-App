@@ -9,6 +9,16 @@ class AuthPage extends Component {
     this.passwordEl = React.createRef();
   }
 
+  state = {
+    isLogin: true
+  }
+
+  onLoginClick = () => {
+    this.setState(prevState => {
+      return { isLogin: !prevState.isLogin };
+    })
+  }
+
   submitHandler = (e) => {
     e.preventDefault();
     const email = this.emailEl.current.value;
@@ -35,10 +45,23 @@ class AuthPage extends Component {
       headers: {
         'Content-Type': 'application/json'
       }
-    });
+    })
+      .then(res => {
+        if (res.status !== 200 && res.status !== 201) {
+          throw new Error('Failed!');
+        }
+        return res.json();
+      })
+      .then(resData => {
+        console.log('response is: ', resData)
+      })
+      .catch(err => {
+        console.log(err);
+      });
   }
 
   render() {
+    const { isLogin } = this.state;
     return (
       <form className="auth-form" onSubmit={this.submitHandler}>
         <div className="form-control">
@@ -51,7 +74,7 @@ class AuthPage extends Component {
         </div>
         <div className="form-actions">
           <button type="submit">Submit</button>
-          <button>Switch to Signup</button>
+          <button onClick={this.onLoginClick}>Switch to {isLogin ? 'Signup' : 'login'}</button>
         </div>
       </form>
     )
